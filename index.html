@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estudos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .timer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .premiacao {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Controle de Estudos</h1>
+    <div class="container">
+        <h3>🎯 Escolha uma Categoria:</h3>
+        <div class="timer">
+            <span>NOÇÕES DE DIREITO PENAL E DE DIREITO PROCESSUAL PENAL</span>
+            <span id="tempoOrcamento">00:00:00</span>
+            <button onclick="iniciarPausar('orcamento')">▶️</button>
+        </div>
+        <div class="timer">
+            <span>SEGURANÇA DE DIGNITÁRIOS</span>
+            <span id="tempoGestao">00:00:00</span>
+            <button onclick="iniciarPausar('gestao')">▶️</button>
+        </div>
+        <div class="timer">
+            <span>SEGURANÇA ORGÂNICA</span>
+            <span id="tempoAdmFin">00:00:00</span>
+            <button onclick="iniciarPausar('admFin')">▶️</button>
+        </div>
+        <div class="timer">
+            <span>LEGISLAÇÃO RELACIONADA</span>
+            <span id="tempoAdmFin">00:00:00</span>
+            <button onclick="iniciarPausar('admFin')">▶️</button>
+        </div>
+
+        <button onclick="zerarTempo()">🔄 Zerar Tempos</button>
+
+        <h3>⏳ Tempo Total Estudado: <span id="tempoTotal">00:00:00</span></h3>
+
+        <div class="premiacao">
+            <h3>🏆 Conquistas Desbloqueadas</h3>
+            <ul id="listaConquistas"></ul>
+        </div>
+    </div>
+
+    <audio id="audioNotificacao" src="https://www.myinstants.com/media/sounds/tada-fanfare-a.mp3"></audio>
+
+    <script>
+        let timers = {
+            orcamento: { tempo: 0, rodando: false, intervalo: null },
+            gestao: { tempo: 0, rodando: false, intervalo: null },
+            admFin: { tempo: 0, rodando: false, intervalo: null }
+        };
+
+        let conquistas = [
+            { nome: "Primeiros Passos", tempo: 30 },
+            { nome: "Estudante Dedicado", tempo: 180 },
+            { nome: "Maratonista do Estudo", tempo: 600 },
+            { nome: "Mestre do Conhecimento", tempo: 1200 }
+        ];
+
+        let conquistasDesbloqueadas = JSON.parse(localStorage.getItem("conquistas")) || [];
+
+        function formatarTempo(segundos) {
+            let h = Math.floor(segundos / 3600);
+            let m = Math.floor((segundos % 3600) / 60);
+            let s = segundos % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function iniciarPausar(categoria) {
+            if (!timers[categoria].rodando) {
+                timers[categoria].rodando = true;
+                timers[categoria].intervalo = setInterval(() => {
+                    timers[categoria].tempo++;
+                    document.getElementById(`tempo${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`).innerText = formatarTempo(timers[categoria].tempo);
+                    atualizarTempoTotal();
+                    verificarConquistas();
+                }, 1000);
+            } else {
+                clearInterval(timers[categoria].intervalo);
+                timers[categoria].rodando = false;
+            }
+        }
+
+        function atualizarTempoTotal() {
+            let total = Object.values(timers).reduce((acc, cat) => acc + cat.tempo, 0);
+            document.getElementById("tempoTotal").innerText = formatarTempo(total);
+        }
+
+        function verificarConquistas() {
+            let tempoTotal = Object.values(timers).reduce((acc, cat) => acc + cat.tempo, 0) / 60;
+            
+            conquistas.forEach(conquista => {
+                if (tempoTotal >= conquista.tempo && !conquistasDesbloqueadas.includes(conquista.nome)) {
+                    conquistasDesbloqueadas.push(conquista.nome);
+                    exibirNotificacaoConquista(conquista.nome);
+                }
+            });
+
+            atualizarListaConquistas();
+            localStorage.setItem("conquistas", JSON.stringify(conquistasDesbloqueadas));
+        }
+
+        function exibirNotificacaoConquista(nomeConquista) {
+            alert(`🎉 Parabéns! Você desbloqueou a conquista: "${nomeConquista}"!`);
+            document.getElementById("audioNotificacao").play();
+        }
+
+        function atualizarListaConquistas() {
+            const listaConquistas = document.getElementById("listaConquistas");
+            listaConquistas.innerHTML = "";
+
+            conquistasDesbloqueadas.forEach(conquista => {
+                const li = document.createElement("li");
+                li.textContent = `🏆 ${conquista}`;
+                listaConquistas.appendChild(li);
+            });
+        }
+
+        function zerarTempo() {
+            Object.keys(timers).forEach(cat => {
+                clearInterval(timers[cat].intervalo);
+                timers[cat].tempo = 0;
+                timers[cat].rodando = false;
+                document.getElementById(`tempo${cat.charAt(0).toUpperCase() + cat.slice(1)}`).innerText = "00:00:00";
+            });
+            atualizarTempoTotal();
+        }
+
+        setInterval(verificarConquistas, 5000);
+        atualizarListaConquistas();
+    </script>
+</body>
+</html>

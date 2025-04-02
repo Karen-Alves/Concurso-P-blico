@@ -1,0 +1,30 @@
+const form = document.getElementById("form-tarefa");
+const inputTarefa = document.getElementById("nome-tarefa");
+const dataTarefa = document.getElementById("data-tarefa");
+const listaTarefas = document.getElementById("tarefas");
+
+// Função para adicionar tarefas
+form.addEventListener("submit", function(event) {
+    event.preventDefault(); // Evita recarregar a página
+
+    const nomeTarefa = inputTarefa.value;
+    const data = dataTarefa.value ? `📅 ${dataTarefa.value}` : "";
+
+    if (nomeTarefa.trim() !== "") {
+        // Criar um item de lista
+        const li = document.createElement("li");
+        li.innerHTML = `${nomeTarefa} ${data} <button onclick="removerTarefa(this)">❌</button>`;
+
+        // Adicionar à lista
+        listaTarefas.appendChild(li);
+
+        // Limpar campos
+        inputTarefa.value = "";
+        dataTarefa.value = "";
+    }
+});
+
+// Função para remover tarefas
+function removerTarefa(elemento) {
+    elemento.parentElement.remove();
+}

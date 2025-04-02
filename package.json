@@ -1,0 +1,19 @@
+{
+  "name": "concurso-publico",
+  "version": "1.0.0",
+  "description": "Projeto de Controle de Estudos",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Karen-Alves/Concurso-P-blico.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Karen-Alves/Concurso-P-blico/issues"
+  },
+  "homepage": "https://github.com/Karen-Alves/Concurso-P-blico#readme"
+}
